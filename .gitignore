@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual Env
+.venv/
+venv/
+
+# Mac
+.DS_Store
+
+# Ollama Cache
+ollama/
+
+# Outputs
+storage/output/
+storage/temp/
+
+# Logs
+*.log
+
+# VS Code
+.vscode/
+
+# Env
+.env
+
+# SQLite
+*.sqlite
+*.db

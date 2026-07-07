@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bid Analyzer Frontend</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <div>
+        <h1>Bid Analyzer</h1>
+        <p>Upload PDF quotations, start analysis, and download the generated comparison spreadsheet.</p>
+      </div>
+    </header>
+
+    <main>
+      <section class="panel">
+        <h2>1. Upload PDF files</h2>
+        <p>Select one or more PDF quotation files from your computer.</p>
+        <input id="pdfFiles" type="file" accept="application/pdf" multiple />
+        <button id="uploadBtn" class="primary">Upload PDFs</button>
+        <div id="uploadResult" class="message"></div>
+      </section>
+
+      <section class="panel">
+        <h2>2. Analyze job</h2>
+        <label for="jobIdInput">Job ID</label>
+        <input id="jobIdInput" type="text" placeholder="Paste job ID from upload" />
+        <div class="button-row">
+          <button id="analyzeBtn" class="primary">Start Analysis</button>
+          <button id="statusBtn">Check Status</button>
+          <button id="downloadBtn">Download Result</button>
+        </div>
+        <div id="jobResult" class="message"></div>
+      </section>
+
+      <section class="panel">
+        <h2>3. Activity log</h2>
+        <textarea id="logOutput" readonly></textarea>
+      </section>
+    </main>
+
+    <footer>
+      <p>Backend API available at <code>/upload</code>, <code>/analyze</code>, <code>/status/{job_id}</code>, <code>/download/{job_id}</code>.</p>
+    </footer>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

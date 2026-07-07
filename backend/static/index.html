@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bid Analyzer Upload</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 32px; max-width: 860px; }
+    h1 { margin-bottom: 12px; }
+    .card { border: 1px solid #ddd; border-radius: 10px; padding: 20px; margin-bottom: 24px; }
+    button { padding: 10px 16px; font-size: 16px; }
+    input[type=file] { display: block; margin-bottom: 12px; }
+    textarea { width: 100%; min-height: 140px; margin-top: 12px; }
+    .success { color: green; }
+    .error { color: red; }
+    .link { color: blue; text-decoration: underline; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Bid Analyzer</h1>
+  <div class="card">
+    <h2>1. Upload PDF</h2>
+    <input id="pdfFiles" type="file" accept="application/pdf" multiple />
+    <button id="uploadBtn">Upload</button>
+    <div id="uploadResult"></div>
+  </div>
+  <div class="card">
+    <h2>2. Analyze job</h2>
+    <input id="jobIdInput" type="text" placeholder="Enter job_id from upload" style="width: 100%; padding: 10px; margin-bottom: 12px;" />
+    <button id="analyzeBtn">Analyze</button>
+    <button id="statusBtn">Check Status</button>
+    <button id="downloadBtn">Download Result</button>
+    <div id="jobResult"></div>
+  </div>
+  <div class="card">
+    <h2>Logs / Response</h2>
+    <textarea id="logOutput" readonly></textarea>
+  </div>
+  <script>
+    const uploadBtn = document.getElementById('uploadBtn');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const statusBtn = document.getElementById('statusBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const filesInput = document.getElementById('pdfFiles');
+    const uploadResult = document.getElementById('uploadResult');
+    const jobResult = document.getElementById('jobResult');
+    const logOutput = document.getElementById('logOutput');
+    const jobIdInput = document.getElementById('jobIdInput');
+    let statusInterval = null;
+
+    function log(message, type='') {
+      const prefix = type === 'error' ? 'ERROR: ' : '';
+      logOutput.value += prefix + message + '\n';
+      logOutput.scrollTop = logOutput.scrollHeight;
+    }
+
+    function setJobResult(html) {
+      jobResult.innerHTML = html;
+    }
+
+    async function fetchStatus(jobId) {
+      const res = await fetch('/status/' + encodeURIComponent(jobId));
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.detail || res.statusText);
+      }
+      return res.json();
+    }
+
+    async function showStatus(jobId) {
+      const data = await fetchStatus(jobId);
+      let html = `Status: <strong>${data.status}</strong>`;
+      if (data.output) {
+        html += `<br/><span class="success">Output ready:</span> ${data.output}`;
+        html += `<br/><a href="${data.download_url}" target="_blank">Download result</a>`;
+      }
+      setJobResult(html);
+      log('Status response: ' + JSON.stringify(data));
+      return data;
+    }
+
+    uploadBtn.addEventListener('click', async () => {
+      const files = filesInput.files;
+      if (!files.length) {
+        uploadResult.innerHTML = '<span class="error">Please choose at least one PDF file.</span>';
+        return;
+      }
+
+      const formData = new FormData();
+      for (const file of files) {
+        formData.append('files', file);
+      }
+
+      try {
+        const res = await fetch('/upload', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
+        uploadResult.innerHTML = '<span class="success">Upload succeeded. Job ID: ' + data.job_id + '</span>';
+        jobIdInput.value = data.job_id;
+        log('Upload response: ' + JSON.stringify(data));
+      } catch (err) {
+        uploadResult.innerHTML = '<span class="error">Upload failed.</span>';
+        log('Upload failed: ' + err.message, 'error');
+      }
+    });
+
+    analyzeBtn.addEventListener('click', async () => {
+      const jobId = jobIdInput.value.trim();
+      if (!jobId) {
+        setJobResult('<span class="error">Enter a job ID first.</span>');
+        return;
+      }
+      try {
+        const res = await fetch('/analyze?job_id=' + encodeURIComponent(jobId), { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
+        setJobResult('<span class="success">Analyze queued for job_id: ' + data.job_id + '</span>');
+        log('Analyze response: ' + JSON.stringify(data));
+        if (statusInterval) {
+          clearInterval(statusInterval);
+        }
+        statusInterval = setInterval(async () => {
+          try {
+            const statusData = await showStatus(jobId);
+            if (!statusData) {
+              clearInterval(statusInterval);
+              return;
+            }
+            if (statusData.status !== 'running' && statusData.status !== 'queued') {
+              clearInterval(statusInterval);
+            }
+          } catch (err) {
+            clearInterval(statusInterval);
+          }
+        }, 5000);
+      } catch (err) {
+        setJobResult('<span class="error">Analyze failed.</span>');
+        log('Analyze failed: ' + err.message, 'error');
+      }
+    });
+
+    statusBtn.addEventListener('click', async () => {
+      const jobId = jobIdInput.value.trim();
+      if (!jobId) {
+        setJobResult('<span class="error">Enter a job ID first.</span>');
+        return;
+      }
+      await showStatus(jobId);
+    });
+
+    downloadBtn.addEventListener('click', async () => {
+      const jobId = jobIdInput.value.trim();
+      if (!jobId) {
+        setJobResult('<span class="error">Enter a job ID first.</span>');
+        return;
+      }
+      window.location.href = '/download/' + encodeURIComponent(jobId);
+    });
+  </script>
+</body>
+</html>
