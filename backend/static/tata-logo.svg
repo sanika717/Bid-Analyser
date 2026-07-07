@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 280">
+  <defs>
+    <linearGradient id="blueGrad" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#005eb8" />
+      <stop offset="100%" stop-color="#003f8a" />
+    </linearGradient>
+  </defs>
+  <rect width="860" height="280" fill="none" />
+  <g transform="translate(80, 20)">
+    <circle cx="120" cy="120" r="100" fill="url(#blueGrad)" />
+    <path d="M88 65 Q120 20 152 65 L152 110 Q138 96 120 80 Q102 96 88 110 Z" fill="#fff" />
+    <rect x="114" y="110" width="12" height="80" rx="6" fill="#fff" />
+    <path d="M52 160 Q120 95 188 160" stroke="#fff" stroke-width="16" fill="none" stroke-linecap="round" />
+  </g>
+  <g transform="translate(260, 70)">
+    <text x="0" y="0" font-family="Inter, system-ui, sans-serif" font-size="92" font-weight="800" fill="#005eb8">TATA</text>
+    <text x="0" y="90" font-family="Inter, system-ui, sans-serif" font-size="44" font-weight="700" fill="#0d3b66">CONSULTING ENGINEERS</text>
+  </g>
+</svg>

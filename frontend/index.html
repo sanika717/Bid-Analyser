@@ -1,52 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bid Analyzer Frontend</title>
-  <link rel="stylesheet" href="/static/styles.css" />
-</head>
-<body>
-  <div class="page-shell">
-    <header class="hero">
-      <div>
-        <h1>Bid Analyzer</h1>
-        <p>Upload PDF quotations, start analysis, and download the generated comparison spreadsheet.</p>
-      </div>
-    </header>
-
-    <main>
-      <section class="panel">
-        <h2>1. Upload PDF files</h2>
-        <p>Select one or more PDF quotation files from your computer.</p>
-        <input id="pdfFiles" type="file" accept="application/pdf" multiple />
-        <button id="uploadBtn" class="primary">Upload PDFs</button>
-        <div id="uploadResult" class="message"></div>
-      </section>
-
-      <section class="panel">
-        <h2>2. Analyze job</h2>
-        <label for="jobIdInput">Job ID</label>
-        <input id="jobIdInput" type="text" placeholder="Paste job ID from upload" />
-        <div class="button-row">
-          <button id="analyzeBtn" class="primary">Start Analysis</button>
-          <button id="statusBtn">Check Status</button>
-          <button id="downloadBtn">Download Result</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TCE Universal Bid Comparison Engine</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">TCE</p>
+          <h1>Universal Bid Comparison Engine</h1>
+          <p>Upload quotation PDFs, run an automated comparison workflow, and download a structured Excel package with ranking and vendor evidence.</p>
         </div>
-        <div id="jobResult" class="message"></div>
-      </section>
+      </header>
 
-      <section class="panel">
-        <h2>3. Activity log</h2>
-        <textarea id="logOutput" readonly></textarea>
-      </section>
-    </main>
+      <main>
+        <section class="panel auth-grid">
+          <div>
+            <h2>Sign in</h2>
+            <p>Use the default administrator credentials to access the processing workflow.</p>
+            <label for="usernameInput">Username</label>
+            <input id="usernameInput" type="text" value="admin" />
+            <label for="passwordInput">Password</label>
+            <input id="passwordInput" type="password" value="admin123" />
+            <button id="loginBtn" class="primary">Log in</button>
+            <div id="authResult" class="message"></div>
+          </div>
+          <div class="status-card">
+            <h3>System status</h3>
+            <p id="healthText">Checking service health…</p>
+            <div class="pill-row">
+              <span class="pill">FastAPI</span>
+              <span class="pill">Excel output</span>
+              <span class="pill">Authentication</span>
+            </div>
+          </div>
+        </section>
 
-    <footer>
-      <p>Backend API available at <code>/upload</code>, <code>/analyze</code>, <code>/status/{job_id}</code>, <code>/download/{job_id}</code>.</p>
-    </footer>
-  </div>
+        <section class="panel">
+          <h2>1. Upload PDFs and optional template</h2>
+          <p>Select one or more quotation PDFs. If you have a custom workbook, upload it; otherwise the bundled template is used.</p>
+          <input id="pdfFiles" type="file" accept="application/pdf" multiple />
+          <input id="templateFile" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+          <button id="uploadBtn" class="primary">Upload PDFs</button>
+          <div id="uploadResult" class="message"></div>
+        </section>
 
-  <script src="/static/app.js"></script>
-</body>
+        <section class="panel">
+          <h2>2. Analyze job</h2>
+          <label for="jobIdInput">Job ID</label>
+          <input id="jobIdInput" type="text" placeholder="Paste job ID from upload" />
+          <div class="button-row">
+            <button id="analyzeBtn" class="primary">Start Analysis</button>
+            <button id="statusBtn">Check Status</button>
+            <button id="downloadBtn">Download Result</button>
+          </div>
+          <div id="jobResult" class="message"></div>
+        </section>
+
+        <section class="panel">
+          <h2>3. Recent jobs</h2>
+          <div id="jobList" class="job-list"></div>
+        </section>
+
+        <section class="panel">
+          <h2>4. Activity log</h2>
+          <textarea id="logOutput" readonly></textarea>
+        </section>
+      </main>
+    </div>
+
+    <script src="/static/app.js"></script>
+  </body>
 </html>

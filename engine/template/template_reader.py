@@ -1,6 +1,10 @@
 from pathlib import Path
 
+from engine.template.template_parser import extract_template_requirements
+
+
 def read_template(path: Path):
-    # For now, return the path; detailed template-driven dynamic mapping
-    # is supported by the legacy engine via template.xlsx layout.
-    return path
+    return {
+        "path": str(path),
+        "requirements": extract_template_requirements(path),
+    }

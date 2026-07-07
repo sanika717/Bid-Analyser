@@ -1,7 +1,5 @@
 import os
 import requests
-from typing import Any
-
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434/api/generate")
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3:8b")

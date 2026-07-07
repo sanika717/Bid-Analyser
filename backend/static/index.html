@@ -3,159 +3,179 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bid Analyzer Upload</title>
+  <title>Tata Consulting Engineers | AI Bid Analyzer</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 32px; max-width: 860px; }
-    h1 { margin-bottom: 12px; }
-    .card { border: 1px solid #ddd; border-radius: 10px; padding: 20px; margin-bottom: 24px; }
-    button { padding: 10px 16px; font-size: 16px; }
-    input[type=file] { display: block; margin-bottom: 12px; }
-    textarea { width: 100%; min-height: 140px; margin-top: 12px; }
-    .success { color: green; }
-    .error { color: red; }
-    .link { color: blue; text-decoration: underline; cursor: pointer; }
+    :root { --blue: #0d3b66; --cyan: #1e81b0; --light: #f5f7fb; --gray: #5f6c7b; --dark: #081d40; --white: #ffffff; --shadow: 0 16px 40px rgba(13, 59, 102, 0.14); }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, system-ui, sans-serif; background: radial-gradient(circle at top left, #1e81b0 0%, #0d3b66 45%, #081d40 100%); color: #1b263b; min-height: 100vh; }
+    body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(circle at top right, rgba(255,255,255,0.1), transparent 35%); pointer-events: none; }
+    .page { max-width: 1200px; margin: 0 auto; padding: 24px; position: relative; }
+    header { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: center; margin-bottom: 24px; }
+    .brand { display: flex; align-items: center; gap: 16px; color: #fff; }
+    .brand img { width: 64px; height: auto; }
+    .brand h1 { margin: 0; font-size: 1.8rem; letter-spacing: -0.04em; }
+    .brand p { margin: 4px 0 0; color: rgba(255,255,255,0.8); font-size: 0.95rem; }
+    .status-chip { display: none; }
+    .layout { display: grid; gap: 20px; grid-template-columns: 280px 1fr; align-items: start; }
+    aside.sidebar { display: flex; flex-direction: column; gap: 18px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 24px; padding: 24px; min-height: calc(100vh - 96px); color: #fff; }
+    .sidebar-brand { display: grid; gap: 6px; margin-bottom: 12px; }
+    .sidebar-brand strong { font-size: 1.4rem; letter-spacing: 0.04em; }
+    .sidebar-brand span { color: rgba(255,255,255,0.75); }
+    .nav-link { width: 100%; text-align: left; border: 0; border-radius: 18px; background: rgba(255,255,255,0.08); color: #fff; padding: 14px 18px; font-size: 1rem; cursor: pointer; transition: background 0.2s ease; }
+    .nav-link.active, .nav-link:hover { background: rgba(255,255,255,0.18); }
+    .sidebar-spacer { flex: 1; }
+    .panel { background: rgba(255,255,255,0.96); border-radius: 24px; padding: 24px; box-shadow: var(--shadow); }
+    .auth-panel { max-width: 520px; margin: 80px auto; }
+    .panel h2, .panel h3 { margin-top: 0; color: #0d3b66; }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 18px; }
+    .dashboard-header h2 { margin: 0; }
+    .field-group { margin-bottom: 18px; }
+    .button { border: 0; border-radius: 999px; padding: 12px 20px; cursor: pointer; font-weight: 700; transition: transform 0.16s ease, background 0.16s ease, opacity 0.16s ease; }
+    .button.primary { background: var(--blue); color: #fff; }
+    .button.secondary { background: #eef4fb; color: var(--blue); }
+    .button:hover { transform: translateY(-1px); }
+    input, select, textarea { width: 100%; border: 1px solid #d7dfe9; border-radius: 14px; padding: 14px 16px; font-size: 1rem; color: #1b263b; background: #fff; }
+    label { display: block; margin-bottom: 10px; font-weight: 700; color: #0d3b66; }
+    .note { color: #5f6c7b; font-size: 0.95rem; margin-top: 4px; }
+    .message { margin-top: 14px; font-size: 0.97rem; line-height: 1.5; }
+    .message.success { color: #1f7a32; }
+    .message.error { color: #b21f21; }
+    .job-list, .log-list { display: grid; gap: 14px; }
+    .job-card, .log-item { border: 1px solid #e6ebf4; border-radius: 18px; padding: 18px; background: #fff; }
+    .job-card strong, .log-item strong { color: #0d3b66; }
+    .job-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    .compact { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+    .hidden { display: none; }
+    .row { display: grid; gap: 16px; }
+    .two-column { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .secondary-panel { background: #f5f7fb; border: 1px solid #d7dfe9; }
+    .assistant-badge { position: fixed; bottom: 24px; right: 24px; width: 320px; max-width: calc(100% - 48px); background: rgba(255,255,255,0.97); border-radius: 28px; box-shadow: 0 24px 50px rgba(10, 25, 64, 0.25); z-index: 1000; overflow: hidden; }
+    .assistant-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 18px; background: #0d3b66; color: #fff; }
+    .assistant-body { padding: 18px; }
+    .assistant-status { color: #c5d8ff; margin-bottom: 12px; font-size: 0.95rem; }
+    .assistant-response { margin-top: 16px; min-height: 56px; padding: 14px 16px; background: #eef4fb; border-radius: 18px; color: #1b263b; white-space: pre-wrap; }
+    @media (max-width: 960px) {
+      .layout { grid-template-columns: 1fr; }
+      aside.sidebar { min-height: auto; }
+      .dashboard-header { flex-direction: column; align-items: stretch; }
+      .assistant-badge { width: calc(100% - 32px); right: 16px; left: 16px; }
+    }
   </style>
 </head>
 <body>
-  <h1>Bid Analyzer</h1>
-  <div class="card">
-    <h2>1. Upload PDF</h2>
-    <input id="pdfFiles" type="file" accept="application/pdf" multiple />
-    <button id="uploadBtn">Upload</button>
-    <div id="uploadResult"></div>
+  <div class="page" id="authPage">
+    <header>
+      <div class="brand">
+        <img src="/static/tata-logo.svg" alt="Tata Consulting Engineers" />
+        <div>
+          <h1>Tata Consulting Engineers</h1>
+          <p>Procurement decision support platform</p>
+        </div>
+      </div>
+    </header>
+
+    <section class="panel auth-panel" id="authPanel">
+      <h2>Sign in to TCE</h2>
+      <div id="loginForm">
+        <div class="field-group"><label for="emailInput">Email</label><input id="emailInput" type="email" placeholder="name@company.com" /></div>
+        <div class="field-group"><label for="passwordInput">Password</label><input id="passwordInput" type="password" placeholder="••••••••" /></div>
+        <div class="field-group compact"><button class="button primary" id="loginBtn">Login</button><button class="button secondary" id="showRegisterBtn">Register</button></div>
+        <div class="field-group compact"><button class="button secondary" id="showResetBtn">Forgot password?</button></div>
+        <div id="authMessage" class="message"></div>
+      </div>
+
+      <div id="registerForm" class="hidden">
+        <div class="field-group"><label for="regNameInput">Your name</label><input id="regNameInput" type="text" placeholder="Jane Doe" /></div>
+        <div class="field-group"><label for="regEmailInput">Email</label><input id="regEmailInput" type="email" placeholder="name@company.com" /></div>
+        <div class="field-group"><label for="regPasswordInput">Password</label><input id="regPasswordInput" type="password" placeholder="Create a password" /></div>
+        <div class="field-group compact"><button class="button primary" id="registerBtn">Create account</button><button class="button secondary" id="backToLoginBtn">Back to login</button></div>
+        <div id="registerMessage" class="message"></div>
+      </div>
+
+      <div id="resetForm" class="hidden">
+        <div class="field-group"><label for="resetEmailInput">Email</label><input id="resetEmailInput" type="email" placeholder="name@company.com" /></div>
+        <div class="field-group compact"><button class="button primary" id="resetBtn">Request reset</button><button class="button secondary" id="backToLoginBtn2">Back to login</button></div>
+        <div id="resetMessage" class="message"></div>
+      </div>
+    </section>
   </div>
-  <div class="card">
-    <h2>2. Analyze job</h2>
-    <input id="jobIdInput" type="text" placeholder="Enter job_id from upload" style="width: 100%; padding: 10px; margin-bottom: 12px;" />
-    <button id="analyzeBtn">Analyze</button>
-    <button id="statusBtn">Check Status</button>
-    <button id="downloadBtn">Download Result</button>
-    <div id="jobResult"></div>
+
+  <div class="page hidden" id="mainPage">
+    <header>
+      <div class="brand">
+        <img src="/static/tata-logo.svg" alt="Tata Consulting Engineers" />
+        <div>
+          <h1>Tata Consulting Engineers</h1>
+        <p>Bid analytics & procurement intelligence</p>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <strong>TCE</strong>
+          <span>Procurement Suite</span>
+        </div>
+        <button class="nav-link active" id="navDashboard">Dashboard</button>
+        <button class="nav-link" id="navHistory">History</button>
+        <div class="sidebar-spacer"></div>
+        <button class="button secondary" id="logoutBtn">Logout</button>
+      </aside>
+
+      <main>
+        <section class="panel" id="dashboardPanel">
+          <div class="dashboard-header">
+            <div>
+              <h2>Dashboard</h2>
+              <p class="note">Upload bid files and review logs for recent activity.</p>
+            </div>
+            <button class="button secondary" id="loadJobsBtn">Refresh history</button>
+          </div>
+
+          <div class="row two-column">
+            <div class="field-group">
+              <label for="pdfFiles">Select PDF bid files</label>
+              <input id="pdfFiles" type="file" accept="application/pdf" multiple />
+            </div>
+            <div class="field-group">
+              <label for="templateFile">Upload optional template</label>
+              <input id="templateFile" type="file" accept=".xlsx" />
+            </div>
+          </div>
+          <div class="field-group compact">
+            <button class="button primary" id="uploadBtn">Upload & create job</button>
+          </div>
+          <div id="uploadResult" class="message"></div>
+
+          <div class="panel secondary-panel">
+            <h3>Activity logs</h3>
+            <div id="logList" class="log-list"></div>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="historyPanel">
+          <div class="dashboard-header">
+            <div>
+              <h2>History</h2>
+              <p class="note">Review past analysis runs and download completed outputs.</p>
+            </div>
+          </div>
+          <div id="jobList" class="job-list"></div>
+        </section>
+      </main>
+    </div>
   </div>
-  <div class="card">
-    <h2>Logs / Response</h2>
-    <textarea id="logOutput" readonly></textarea>
+
+  <div class="assistant-badge" id="assistantBadge">
+    <div class="assistant-header">
+      <span>AI Assistant</span>
+      <button id="assistantCloseBtn">×</button>
+    </div>
+    <div class="assistant-body">
+      <div class="assistant-status">Online</div>
+      <textarea id="assistantQuestion" rows="3" placeholder="Ask a question about bids or suppliers..."></textarea>
+      <button class="button primary" id="askBtn">Ask</button>
+      <div id="assistantResponse" class="assistant-response"></div>
+    </div>
   </div>
-  <script>
-    const uploadBtn = document.getElementById('uploadBtn');
-    const analyzeBtn = document.getElementById('analyzeBtn');
-    const statusBtn = document.getElementById('statusBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const filesInput = document.getElementById('pdfFiles');
-    const uploadResult = document.getElementById('uploadResult');
-    const jobResult = document.getElementById('jobResult');
-    const logOutput = document.getElementById('logOutput');
-    const jobIdInput = document.getElementById('jobIdInput');
-    let statusInterval = null;
 
-    function log(message, type='') {
-      const prefix = type === 'error' ? 'ERROR: ' : '';
-      logOutput.value += prefix + message + '\n';
-      logOutput.scrollTop = logOutput.scrollHeight;
-    }
-
-    function setJobResult(html) {
-      jobResult.innerHTML = html;
-    }
-
-    async function fetchStatus(jobId) {
-      const res = await fetch('/status/' + encodeURIComponent(jobId));
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.detail || res.statusText);
-      }
-      return res.json();
-    }
-
-    async function showStatus(jobId) {
-      const data = await fetchStatus(jobId);
-      let html = `Status: <strong>${data.status}</strong>`;
-      if (data.output) {
-        html += `<br/><span class="success">Output ready:</span> ${data.output}`;
-        html += `<br/><a href="${data.download_url}" target="_blank">Download result</a>`;
-      }
-      setJobResult(html);
-      log('Status response: ' + JSON.stringify(data));
-      return data;
-    }
-
-    uploadBtn.addEventListener('click', async () => {
-      const files = filesInput.files;
-      if (!files.length) {
-        uploadResult.innerHTML = '<span class="error">Please choose at least one PDF file.</span>';
-        return;
-      }
-
-      const formData = new FormData();
-      for (const file of files) {
-        formData.append('files', file);
-      }
-
-      try {
-        const res = await fetch('/upload', { method: 'POST', body: formData });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
-        uploadResult.innerHTML = '<span class="success">Upload succeeded. Job ID: ' + data.job_id + '</span>';
-        jobIdInput.value = data.job_id;
-        log('Upload response: ' + JSON.stringify(data));
-      } catch (err) {
-        uploadResult.innerHTML = '<span class="error">Upload failed.</span>';
-        log('Upload failed: ' + err.message, 'error');
-      }
-    });
-
-    analyzeBtn.addEventListener('click', async () => {
-      const jobId = jobIdInput.value.trim();
-      if (!jobId) {
-        setJobResult('<span class="error">Enter a job ID first.</span>');
-        return;
-      }
-      try {
-        const res = await fetch('/analyze?job_id=' + encodeURIComponent(jobId), { method: 'POST' });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
-        setJobResult('<span class="success">Analyze queued for job_id: ' + data.job_id + '</span>');
-        log('Analyze response: ' + JSON.stringify(data));
-        if (statusInterval) {
-          clearInterval(statusInterval);
-        }
-        statusInterval = setInterval(async () => {
-          try {
-            const statusData = await showStatus(jobId);
-            if (!statusData) {
-              clearInterval(statusInterval);
-              return;
-            }
-            if (statusData.status !== 'running' && statusData.status !== 'queued') {
-              clearInterval(statusInterval);
-            }
-          } catch (err) {
-            clearInterval(statusInterval);
-          }
-        }, 5000);
-      } catch (err) {
-        setJobResult('<span class="error">Analyze failed.</span>');
-        log('Analyze failed: ' + err.message, 'error');
-      }
-    });
-
-    statusBtn.addEventListener('click', async () => {
-      const jobId = jobIdInput.value.trim();
-      if (!jobId) {
-        setJobResult('<span class="error">Enter a job ID first.</span>');
-        return;
-      }
-      await showStatus(jobId);
-    });
-
-    downloadBtn.addEventListener('click', async () => {
-      const jobId = jobIdInput.value.trim();
-      if (!jobId) {
-        setJobResult('<span class="error">Enter a job ID first.</span>');
-        return;
-      }
-      window.location.href = '/download/' + encodeURIComponent(jobId);
-    });
-  </script>
+  <script src="/static/app.js"></script>
 </body>
 </html>
